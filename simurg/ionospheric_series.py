@@ -1,12 +1,15 @@
 #!/usr/bin/python3
 import argparse
+import pathlib
+from datetime import datetime
 
-parser = argparse.ArgumentParser()
-parser.add_argument('--site', dest='site', type=str)
-parser.add_argument('--mail', dest='mail', type=str)
-parser.add_argument('--n-queries', dest='n_queries', type=int, default=3)
-parser.add_argument('--start-date', dest='start_date', type=str, default='1990-01-01')
-parser.add_argument('--folder', dest='folder', type=str, default='data')
+parser = argparse.ArgumentParser(description='Downloads series data from simurg.iszf.irk.ru')
+parser.add_argument('--site', dest='site', type=str, required=True, help='station code')
+parser.add_argument('--mail', dest='mail', type=str, required=True, help='requesting email')
+parser.add_argument('--n-queries', dest='n_queries', type=int, default=3, help='number of simultaneous queries')
+parser.add_argument('--start-date', dest='start_date', type=str, required=True)
+parser.add_argument('--end-date', dest='end_date', type=str, default=datetime.today().strftime('%Y-%m-%d'))
+parser.add_argument('--folder', dest='folder', type=pathlib.Path, default='data', help='data local destination folder')
 args = parser.parse_args()
 
 import requests
@@ -83,13 +86,18 @@ n_queries = args.n_queries
 running = 0
 
 stations = get_stations()
+if site not in stations:
+    print(f"Wrong site {site}. Use stations.py to list all the stations")
+    exit(-1)
+
 queries = get_queries(mail)
 for query in queries:
     delete_query(query['id'])
     
 current = datetime.strptime(args.start_date, '%Y-%m-%d')
+end_date = datetime.strptime(args.end_date, '%Y-%m-%d')
 
-while current < datetime.now() - timedelta(days=3):
+while current < end_date - timedelta(days=3):
     if running < n_queries:
         create_query(mail, site, current, current + timedelta(days=3))
         print('Query created')
