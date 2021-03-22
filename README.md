@@ -1,6 +1,17 @@
 # Data loaders
-simurg_series.py - downloads series data from simurg.iszf.irk.ru
+## Simurg
+### stations.py
+Checks if station is valid
+
+Usage:
+
+`./stations.py irkj`
+
+### ionospheric_series.py
+Downloads series data from simurg.iszf.irk.ru
+
 Arguments:
+
 <table>
 <tr><th>Argument</th><th>Description</th></tr>
 <tr><td>site</td> <td>station</td></tr>
